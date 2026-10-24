@@ -1,0 +1,224 @@
+{% extends 'base.html' %}
+{% block title %}Бухгалтерия ва Тўловлар{% endblock %}
+
+{% block content %}
+<div class="row mb-4 align-items-center">
+    <div class="col-md-6">
+        <h3 class="fw-bold text-dark mb-0">
+            <i class="fa-solid fa-wallet text-success me-2"></i>Бухгалтерия ва Контракт Назорати
+        </h3>
+        <p class="text-muted small mt-1">Админ ва мугалимдер үчүн окуучулардын төлөмдөрү жана карыздары.</p>
+    </div>
+    <div class="col-md-6 text-md-end">
+        <button class="btn btn-success rounded-pill px-4 me-2" data-bs-toggle="modal" data-bs-target="#addPaymentModal">
+            <i class="fa-solid fa-plus me-1"></i> Төлөм кабыл алуу
+        </button>
+        <button class="btn btn-outline-primary rounded-pill px-4" data-bs-toggle="modal" data-bs-target="#addSalaryModal">
+            <i class="fa-solid fa-money-bill-wave me-1"></i> Айлык берүү
+        </button>
+    </div>
+</div>
+
+<!-- ОКУУЧУЛАРДЫН КОНТРАКТ АБАЛЫ (ҚАРЗДОРЛИК ЖУРНАЛИ) -->
+<div class="card border-0 shadow-sm rounded-4 mb-4">
+    <div class="card-header bg-white border-0 pt-4 px-4">
+        <h5 class="fw-bold text-dark mb-0"><i class="fa-solid fa-users-rectangle text-primary me-2"></i>Окуучулардын Контракт ва Карыздар Балансы</h5>
+    </div>
+    <div class="card-body p-0">
+        <div class="table-responsive">
+            <table class="table table-hover align-middle mb-0">
+                <thead class="table-light">
+                    <tr>
+                        <th class="ps-4">№</th>
+                        <th>Окуучу</th>
+                        <th>Тайпасы</th>
+                        <th>Контракт суммасы</th>
+                        <th>Төлөндү</th>
+                        <th>Калган карызы</th>
+                        <th>Статусу</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for s in students %}
+                    <tr>
+                        <td class="ps-4 fw-bold">{{ forloop.counter }}</td>
+                        <td class="fw-bold text-dark">{{ s.name }}</td>
+                        <td><span class="badge bg-secondary rounded-pill px-3">{{ s.group }}</span></td>
+                        <td>
+                            <!-- Контракт суммасини вебдан бевосита ўзгартириш -->
+                            <form method="POST" class="d-inline-flex align-items-center">
+                                {% csrf_token %}
+                                <input type="hidden" name="form_type" value="set_contract">
+                                <input type="hidden" name="student_id" value="{{ s.id }}">
+                                <input type="number" name="contract_amount" value="{{ s.contract_amount }}" class="form-control form-control-sm rounded-3 me-2" style="width: 100px;" step="0.01">
+                                <button type="submit" class="btn btn-sm btn-outline-success rounded-pill px-2" title="Сактоо"><i class="fa fa-save"></i></button>
+                            </form>
+                        </td>
+                        <td class="text-success fw-bold">+{{ s.total_paid }} сом</td>
+                        <td class="text-danger fw-bold">
+                            {% if s.remaining_debt > 0 %}
+                                {{ s.remaining_debt }} сом
+                            {% else %}
+                                0 сом
+                            {% endif %}
+                        </td>
+                        <td>
+                            {% if s.remaining_debt == 0 and s.contract_amount > 0 %}
+                                <span class="badge bg-success"><i class="fa fa-check-circle me-1"></i>Толук төлөндү</span>
+                            {% elif s.remaining_debt > 0 %}
+                                <span class="badge bg-warning text-dark"><i class="fa fa-exclamation-circle me-1"></i>Карызы бар</span>
+                            {% else %}
+                                <span class="badge bg-secondary">Келишим коюла элек</span>
+                            {% endif %}
+                        </td>
+                    </tr>
+                    {% empty %}
+                    <tr><td colspan="7" class="text-center py-4 text-muted">Окуучулар табылган жок.</td></tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+
+<div class="row g-4">
+    <!-- Окуучулардын Төлөм Тарыхы -->
+    <div class="col-lg-7">
+        <div class="card border-0 shadow-sm rounded-4">
+            <div class="card-header bg-white border-0 pt-4 px-4">
+                <h5 class="fw-bold text-dark mb-0"><i class="fa-solid fa-receipt text-success me-2"></i>Соңку Төлөмдөр Тарыхы</h5>
+            </div>
+            <div class="card-body p-0">
+                <div class="table-responsive">
+                    <table class="table table-hover align-middle mb-0">
+                        <thead class="table-light">
+                            <tr>
+                                <th class="ps-4">Окуучу</th>
+                                <th>Суммасы</th>
+                                <th>Датасы</th>
+                                <th>Максаты</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for p in payments %}
+                            <tr>
+                                <td class="ps-4 fw-bold text-dark">{{ p.student.name }}</td>
+                                <td><span class="badge bg-success-subtle text-success fw-bold px-3 py-2 rounded-pill">+{{ p.amount }} сом</span></td>
+                                <td class="small text-muted">{{ p.date }}</td>
+                                <td class="small">{{ p.description|default:"Келишим (Контракт)" }}</td>
+                            </tr>
+                            {% empty %}
+                            <tr><td colspan="4" class="text-center py-4 text-muted">Төлөмдөр киргизиле элек.</td></tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Айлык Акылар (Мугалимдер) -->
+    <div class="col-lg-5">
+        <div class="card border-0 shadow-sm rounded-4">
+            <div class="card-header bg-white border-0 pt-4 px-4">
+                <h5 class="fw-bold text-dark mb-0"><i class="fa-solid fa-user-check text-primary me-2"></i>Айлык Акы Чыгымдары</h5>
+            </div>
+            <div class="card-body p-0">
+                <div class="table-responsive">
+                    <table class="table table-hover align-middle mb-0">
+                        <thead class="table-light">
+                            <tr>
+                                <th class="ps-4">Кызматкер</th>
+                                <th>Сумма</th>
+                                <th>Мезгили</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for a in accountings %}
+                            <tr>
+                                <td class="ps-4 fw-semibold">{{ a.employee }}</td>
+                                <td><span class="badge bg-danger-subtle text-danger fw-bold px-3 py-2 rounded-pill">-{{ a.amount }} сом</span></td>
+                                <td class="small text-muted">{{ a.month }}</td>
+                            </tr>
+                            {% empty %}
+                            <tr><td colspan="3" class="text-center py-4 text-muted">Айлык жазуулары жок.</td></tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Модалка 1: Төлөм кабыл алуу -->
+<div class="modal fade" id="addPaymentModal" tabindex="-1">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content rounded-4 border-0">
+            <div class="modal-header border-0">
+                <h5 class="modal-title fw-bold">Окуучудан төлөм кабыл алуу</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <form method="POST">
+                {% csrf_token %}
+                <input type="hidden" name="form_type" value="payment">
+                <div class="modal-body">
+                    <div class="mb-3">
+                        <label class="form-label small text-muted">Окуучуну тандаңыз</label>
+                        <select name="student_id" class="form-select rounded-3" required>
+                            <option value="">Тандоо...</option>
+                            {% for s in students %}
+                                <option value="{{ s.id }}">{{ s.name }} ({{ s.group }})</option>
+                            {% endfor %}
+                        </select>
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label small text-muted">Төлөнгөн сумма (Сом)</label>
+                        <input type="number" step="0.01" name="amount" class="form-control rounded-3" required>
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label small text-muted">Түшүндүрмө / Изох</label>
+                        <input type="text" name="description" class="form-control rounded-3" placeholder="Мисалы: Октябрь айы үчүн">
+                    </div>
+                </div>
+                <div class="modal-footer border-0">
+                    <button type="submit" class="btn btn-success rounded-pill px-4">Сактоо</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+<!-- Модалка 2: Айлык берүү -->
+<div class="modal fade" id="addSalaryModal" tabindex="-1">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content rounded-4 border-0">
+            <div class="modal-header border-0">
+                <h5 class="modal-title fw-bold">Айлык акы төлөө</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <form method="POST">
+                {% csrf_token %}
+                <input type="hidden" name="form_type" value="salary">
+                <div class="modal-body">
+                    <div class="mb-3">
+                        <label class="form-label small text-muted">Мугалимдин / Кызматкердин аты</label>
+                        <input type="text" name="employee" class="form-control rounded-3" required placeholder="Ф.И.Ш. киргизиңиз">
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label small text-muted">Суммасы (Сом)</label>
+                        <input type="number" step="0.01" name="amount" class="form-control rounded-3" required>
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label small text-muted">Ой / Мезгил</label>
+                        <input type="text" name="month" class="form-control rounded-3" placeholder="Мисалы: Октябрь 2026">
+                    </div>
+                </div>
+                <div class="modal-footer border-0">
+                    <button type="submit" class="btn btn-primary rounded-pill px-4">Сактоо</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+{% endblock %}

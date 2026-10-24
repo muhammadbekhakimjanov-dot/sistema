@@ -1,0 +1,93 @@
+{% extends 'base.html' %}
+{% block title %}Дежур мугалимдер журналы{% endblock %}
+
+{% block content %}
+<div class="row mb-4 align-items-center">
+    <div class="col">
+        <h3 class="fw-bold text-dark mb-0">
+            <i class="fa-solid fa-user-shield text-success me-2"></i>Дежур мугалимдер журналы ва назорат
+        </h3>
+        <p class="text-muted small mt-1">Устозлар ва окуучулардын келип-кетишин, сабабтуу/сабабсыз келбегендерин назорат кылуу панели.</p>
+    </div>
+</div>
+
+<div class="card border-0 shadow-sm rounded-4 mb-4">
+    <div class="card-body p-4">
+        <h5 class="fw-bold text-dark mb-3"><i class="fa fa-plus-circle text-success me-2"></i>Жаңы дежур отчетун кошуу</h5>
+        <form method="POST">
+            {% csrf_token %}
+            <div class="row g-3">
+                <div class="col-md-4">
+                    <label class="form-label fw-semibold">Дежур мугалим:</label>
+                    <select name="teacher_id" class="form-select rounded-3" required>
+                        <option value="">Мугалимди тандаңыз...</option>
+                        {% for teacher in teachers %}
+                            <option value="{{ teacher.id }}">{{ teacher.name }} ({{ teacher.subject }})</option>
+                        {% endfor %}
+                    </select>
+                </div>
+                <div class="col-md-4">
+                    <label class="form-label fw-semibold">Иш сменасы:</label>
+                    <select name="shift" class="form-select rounded-3" required>
+                        <option value="day">Кундузгү смена (08:00 - 17:00)</option>
+                        <option value="night">Кечки смена (17:00 - 08:00)</option>
+                    </select>
+                </div>
+                <div class="col-md-4">
+                    <label class="form-label fw-semibold">Датасы:</label>
+                    <input type="date" name="date" class="form-control rounded-3" value="{% now 'Y-m-d' %}" required>
+                </div>
+                <div class="col-md-6">
+                    <label class="form-label fw-semibold">Мугалимдердин катышуусу (Келди/Келген жок, себеби):</label>
+                    <textarea name="teachers_attendance" class="form-control rounded-3" rows="2" placeholder="Мисалы: Устаз Ахмад келди, Устаз Б. себептүү келген жок..."></textarea>
+                </div>
+                <div class="col-md-6">
+                    <label class="form-label fw-semibold">Окуучуларды назорат кылуу (Келбегендер жана себептери):</label>
+                    <textarea name="students_attendance" class="form-control rounded-3" rows="2" placeholder="Мисалы: 1-тайпадан 2 окуучу келген жок (ооруп калган)..."></textarea>
+                </div>
+            </div>
+            <button type="submit" class="btn btn-success rounded-pill px-4 mt-3">
+                <i class="fa-solid fa-save me-2"></i>Маалыматты сактоо
+            </button>
+        </form>
+    </div>
+</div>
+
+<!-- Маалыматтар тизмеси ва Архив -->
+<div class="row g-4">
+    {% for duty in duties %}
+    <div class="col-md-6">
+        <div class="card border-0 shadow-sm rounded-4 h-100">
+            <div class="card-body p-4">
+                <div class="d-flex justify-content-between align-items-center mb-3">
+                    <h5 class="fw-bold text-dark mb-0"><i class="fa fa-calendar-day text-primary me-2"></i>{{ duty.date }}</h5>
+                    {% if duty.shift == 'day' %}
+                        <span class="badge bg-warning-subtle text-warning px-3 py-2 rounded-pill">
+                            {{ duty.get_shift_display }}
+                        </span>
+                    {% else %}
+                        <span class="badge bg-dark text-white px-3 py-2 rounded-pill">
+                            {{ duty.get_shift_display }}
+                        </span>
+                    {% endif %}
+                </div>
+                <p class="mb-2"><strong>Дежур мугалим:</strong> {{ duty.teacher.name }}</p>
+                <hr class="opacity-25">
+                <p class="small text-muted mb-1"><i class="fa fa-chalkboard-user text-success me-1"></i> Мугалимдердин абалы:</p>
+                <p class="bg-light p-2 rounded-3 small">{{ duty.teachers_attendance|default:"Маалымат берилген эмес" }}</p>
+
+                <p class="small text-muted mb-1"><i class="fa fa-user-graduate text-primary me-1"></i> Окуучулардын назораты:</p>
+                <p class="bg-light p-2 rounded-3 small">{{ duty.students_attendance|default:"Маалымат берилген эмес" }}</p>
+            </div>
+        </div>
+    </div>
+    {% empty %}
+    <div class="col-12">
+        <div class="text-center py-5 text-muted">
+            <i class="fa fa-book-open fa-3x mb-3 opacity-50"></i>
+            <p>Азырынча дежур журналга эч кандай жазуу киргизиле элек.</p>
+        </div>
+    </div>
+    {% endfor %}
+</div>
+{% endblock %}

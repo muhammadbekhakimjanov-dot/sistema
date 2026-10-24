@@ -1,0 +1,58 @@
+{% extends 'base.html' %}
+{% block title %}Кулактандыруулар{% endblock %}
+
+{% block content %}
+<div class="d-flex justify-content-between align-items-center mb-4">
+    <h3 class="fw-bold text-dark mb-0"><i class="fa-solid fa-bullhorn text-warning me-2"></i>Кулактандыруулар</h3>
+    <button class="btn btn-warning rounded-pill px-4 text-dark fw-semibold" data-bs-toggle="modal" data-bs-target="#addAnnModal">
+        <i class="fa-solid fa-plus me-2"></i>Жаңы кулактандыруу
+    </button>
+</div>
+
+<div class="row g-3">
+    {% for item in announcements %}
+    <div class="col-md-6">
+        <div class="card border-0 shadow-sm rounded-4 h-100">
+            <div class="card-body p-4">
+                <h5 class="fw-bold text-dark">{{ item.title }}</h5>
+                <p class="text-muted small mb-3">{{ item.content }}</p>
+                <div class="d-flex justify-content-between align-items-center">
+                    <small class="text-muted"><i class="fa-solid fa-user me-1"></i> {{ item.author|default:"Админ" }}</small>
+                    <small class="text-muted"><i class="fa-solid fa-clock me-1"></i> {{ item.created_at|date:"d.m.Y" }}</small>
+                </div>
+            </div>
+        </div>
+    </div>
+    {% empty %}
+    <div class="col-12"><div class="alert alert-light text-center rounded-4 p-4 text-muted">Кулактандыруулар жок.</div></div>
+    {% endfor %}
+</div>
+
+<!-- Modal -->
+<div class="modal fade" id="addAnnModal" tabindex="-1">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content rounded-4 border-0">
+            <div class="modal-header border-0">
+                <h5 class="modal-title fw-bold">Жаңы кулактандыруу</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <form method="POST">
+                {% csrf_token %}
+                <div class="modal-body">
+                    <div class="mb-3">
+                        <label class="form-label small text-muted">Темасы</label>
+                        <input type="text" name="title" class="form-control rounded-3" required>
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label small text-muted">Текст</label>
+                        <textarea name="content" class="form-control rounded-3" rows="4" required></textarea>
+                    </div>
+                </div>
+                <div class="modal-footer border-0">
+                    <button type="submit" class="btn btn-warning rounded-pill px-4 text-dark fw-semibold">Жарыялоо</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+{% endblock %}

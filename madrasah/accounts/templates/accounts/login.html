@@ -1,0 +1,43 @@
+{% extends 'base.html' %}
+
+{% block title %}Кирүү - Имам Аль-Бухорий медресеси{% endblock %}
+
+{% block content %}
+<div class="row justify-content-center mt-5">
+    <div class="col-md-5">
+        <div class="card shadow-lg border-0 rounded-4">
+            <div class="card-body p-4 p-md-5">
+                <div class="text-center mb-4">
+                    <i class="fa-solid fa-mosque fa-3x text-primary mb-3"></i>
+                    <h3 class="fw-bold">Медресе тизимига кирүү</h3>
+                    <p class="text-muted">Имам Аль-Бухорий медресеси</p>
+                </div>
+
+                <form method="post">
+                    {% csrf_token %}
+                    
+                    {% if form.errors %}
+                        <div class="alert alert-danger py-2">
+                            Логин ёки сырсөз хато киритилди. Қайта уриниб кўринг.
+                        </div>
+                    {% endif %}
+
+                    <div class="mb-3">
+                        <label for="id_username" class="form-label fw-semibold">Логин (Псевдоним)</label>
+                        <input type="text" name="username" class="form-control" id="id_username" required autofocus>
+                    </div>
+
+                    <div class="mb-4">
+                        <label for="id_password" class="form-label fw-semibold">Сырсөз (Пароль)</label>
+                        <input type="password" name="password" class="form-control" id="id_password" required>
+                    </div>
+
+                    <button type="submit" class="btn btn-primary w-100 py-2 fw-bold shadow-sm">
+                        <i class="fa-solid fa-right-to-bracket me-2">}</i> Кирүү
+                    </button>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

@@ -1,0 +1,35 @@
+{% extends "base.html" %}
+{% block content %}
+<h2>Колдонуучулар</h2>
+<form method="get" class="filters">
+  <input name="q" placeholder="Аты же логин" value="{{ request.GET.q }}">
+  <select name="role"><option value="">Бардык ролдор</option>
+    {% for c, l in roles %}<option value="{{ c }}" {% if request.GET.role == c %}selected{% endif %}>{{ l }}</option>{% endfor %}
+  </select>
+  <button class="btn">Издөө</button>
+  <a class="btn" href="{% url 'user_create' %}">+ Жаңы колдонуучу</a>
+</form>
+<div class="tablewrap">
+<table>
+  <tr><th>Аты-жөнү</th><th>Логин</th><th>Ролу</th><th>Абалы</th><th></th></tr>
+  {% for u in object_list %}
+  <tr>
+    <td>{{ u.full_name }}</td><td>{{ u.username }}</td><td>{{ u.get_role_display }}</td>
+    <td>{% if u.is_active %}Активдүү{% else %}Жабык: {{ u.deactivation_reason }}{% endif %}</td>
+    <td class="actions">
+      <a href="{% url 'user_edit' u.pk %}">Өзгөртүү</a>
+      <form method="post" action="{% url 'user_reset' u.pk %}">{% csrf_token %}<button class="link">Сырсөздү калыбына келтирүү</button></form>
+      <a href="{% url 'user_toggle' u.pk %}">{% if u.is_active %}Жабуу{% else %}Ачуу{% endif %}</a>
+    </td>
+  </tr>
+  {% endfor %}
+</table>
+</div>
+{% if is_paginated %}
+<p class="pager">
+  {% if page_obj.has_previous %}<a href="?page={{ page_obj.previous_page_number }}&q={{ request.GET.q }}&role={{ request.GET.role }}">← Мурунку</a>{% endif %}
+  {{ page_obj.number }} / {{ page_obj.paginator.num_pages }}
+  {% if page_obj.has_next %}<a href="?page={{ page_obj.next_page_number }}&q={{ request.GET.q }}&role={{ request.GET.role }}">Кийинки →</a>{% endif %}
+</p>
+{% endif %}
+{% endblock %}

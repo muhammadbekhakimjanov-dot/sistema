@@ -1,0 +1,62 @@
+{% extends 'base.html' %}
+{% block title %}Катышуу журналы (Давомат){% endblock %}
+
+{% block content %}
+<div class="row mb-4 align-items-center">
+    <div class="col">
+        <h3 class="fw-bold text-dark mb-0">
+            <i class="fa-solid fa-clipboard-user text-success me-2"></i>Катышуу журналы (Давомат)
+        </h3>
+        <p class="text-muted small mt-1">Окуучулардын күнүмдүк сабакка катышуусун белгилөө жана байкоо.</p>
+    </div>
+</div>
+
+<div class="card border-0 shadow-sm rounded-4 mb-4">
+    <div class="card-body p-4">
+        <form method="POST">
+            {% csrf_token %}
+            <div class="mb-3 col-md-4">
+                <label class="form-label fw-bold">Күндү тандоо:</label>
+                <input type="date" name="date" class="form-control rounded-3" value="{% now 'Y-m-d' %}" required>
+            </div>
+
+            <div class="table-responsive">
+                <table class="table table-hover align-middle">
+                    <thead class="table-light">
+                        <tr>
+                            <th>№</th>
+                            <th>Окуучунун аты-жөнү</th>
+                            <th>Тайпасы</th>
+                            <th>Катышуу абалы</th>
+                            <th>Эскертүү</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for student in students %}
+                        <tr>
+                            <td>{{ forloop.counter }}</td>
+                            <td class="fw-semibold">{{ student.name }}</td>
+                            <td><span class="badge bg-secondary">{{ student.group|default:"1-тайпа" }}</span></td>
+                            <td>
+                                <select name="status_{{ student.id }}" class="form-select rounded-3 form-select-sm">
+                                    <option value="present" selected>Келди (Катышты)</option>
+                                    <option value="absent">Келген жок</option>
+                                    <option value="late">Кечикти</option>
+                                    <option value="excused">Себептүү</option>
+                                </select>
+                            </td>
+                            <td>
+                                <input type="text" name="note_{{ student.id }}" class="form-control form-control-sm rounded-3" placeholder="Себеби же эскертүү...">
+                            </td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+            <button type="submit" class="btn btn-success rounded-pill px-4 mt-2">
+                <i class="fa-solid fa-save me-2"></i>Катышууну сактоо
+            </button>
+        </form>
+    </div>
+</div>
+{% endblock %}

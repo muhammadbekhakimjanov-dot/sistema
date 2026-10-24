@@ -1,0 +1,1 @@
+web: gunicorn madrasah.config.wsgi:application

@@ -1,0 +1,115 @@
+{% extends 'base.html' %}
+{% block title %}{{ student.name }} — Документтери{% endblock %}
+
+{% block content %}
+<div class="row mb-4 align-items-center">
+    <div class="col-md-7">
+        <nav aria-label="breadcrumb">
+            <ol class="breadcrumb mb-1">
+                <li class="breadcrumb-item"><a href="{% url 'students_list' %}">Окуучулар</a></li>
+                <li class="breadcrumb-item active" aria-current="page">Документтер</li>
+            </ol>
+        </nav>
+        <h3 class="fw-bold text-dark mb-0">
+            <i class="fa-solid fa-folder-tree text-success me-2"></i>{{ student.name }} — Тапшырылган документтер
+        </h3>
+    </div>
+    <div class="col-md-5 text-md-end mt-3 mt-md-0">
+        <!-- PDF ЮКЛАБ ОЛИШ ТУГМАСИ -->
+        <a href="{% url 'export_student_pdf' student.id %}" class="btn btn-outline-danger rounded-pill px-3 me-2">
+            <i class="fa-solid fa-file-pdf me-1"></i> PDF Анкета
+        </a>
+        <a href="{% url 'students_list' %}" class="btn btn-outline-secondary rounded-pill px-4">
+            <i class="fa-solid fa-arrow-left me-2"></i>Артка кайтуу
+        </a>
+    </div>
+</div>
+
+<div class="card border-0 shadow-sm rounded-4">
+    <div class="card-body p-4">
+        <form method="POST">
+            {% csrf_token %}
+            <div class="row g-3">
+                <div class="col-md-12">
+                    <div class="form-check p-3 bg-light rounded-3">
+                        <input class="form-check-input fs-5" type="checkbox" name="doc_1_application" id="d1" {% if student.doc_1_application %}checked{% endif %}>
+                        <label class="form-check-label fs-6 fw-semibold ms-2 text-dark" for="d1">1. Мүдүрдүн атына арыз (18 толсо өзү, толбосо жооптуу адам)</label>
+                    </div>
+                </div>
+                <div class="col-md-12">
+                    <div class="form-check p-3 bg-light rounded-3">
+                        <input class="form-check-input fs-5" type="checkbox" name="doc_2_passport" id="d2" {% if student.doc_2_passport %}checked{% endif %}>
+                        <label class="form-check-label fs-6 fw-semibold ms-2 text-dark" for="d2">2. Паспорт же туулгандыгы тууралуу күбөлүк</label>
+                    </div>
+                </div>
+                <div class="col-md-12">
+                    <div class="form-check p-3 bg-light rounded-3">
+                        <input class="form-check-input fs-5" type="checkbox" name="doc_3_certificate" id="d3" {% if student.doc_3_certificate %}checked{% endif %}>
+                        <label class="form-check-label fs-6 fw-semibold ms-2 text-dark" for="d3">3. 9-классты бүтүргөндүгү күбөлүк, аттестат же диплом</label>
+                    </div>
+                </div>
+                <div class="col-md-12">
+                    <div class="form-check p-3 bg-light rounded-3">
+                        <input class="form-check-input fs-5" type="checkbox" name="doc_4_reference" id="d4" {% if student.doc_4_reference %}checked{% endif %}>
+                        <label class="form-check-label fs-6 fw-semibold ms-2 text-dark" for="d4">4. Акыркы окуган же иштеген жеринен мүнөздөмө</label>
+                    </div>
+                </div>
+                <div class="col-md-12">
+                    <div class="form-check p-3 bg-light rounded-3">
+                        <input class="form-check-input fs-5" type="checkbox" name="doc_5_military" id="d5" {% if student.doc_5_military %}checked{% endif %}>
+                        <label class="form-check-label fs-6 fw-semibold ms-2 text-dark" for="d5">5. Аскердик каттоо күбөлүгү же приписной</label>
+                    </div>
+                </div>
+                <div class="col-md-12">
+                    <div class="form-check p-3 bg-light rounded-3">
+                        <input class="form-check-input fs-5" type="checkbox" name="doc_6_juvenile" id="d6" {% if student.doc_6_juvenile %}checked{% endif %}>
+                        <label class="form-check-label fs-6 fw-semibold ms-2 text-dark" for="d6">6. ИИБдө ИЖИ каттоодо турбайт деген маалымат (18ге чейин)</label>
+                    </div>
+                </div>
+                <div class="col-md-12">
+                    <div class="form-check p-3 bg-light rounded-3">
+                        <input class="form-check-input fs-5" type="checkbox" name="doc_7_no_criminal" id="d7" {% if student.doc_7_no_criminal %}checked{% endif %}>
+                        <label class="form-check-label fs-6 fw-semibold ms-2 text-dark" for="d7">7. 18 жашка толсо, соттолгон эмес деген маалымат</label>
+                    </div>
+                </div>
+                <div class="col-md-12">
+                    <div class="form-check p-3 bg-light rounded-3">
+                        <input class="form-check-input fs-5" type="checkbox" name="doc_8_photos" id="d8" {% if student.doc_8_photos %}checked{% endif %}>
+                        <label class="form-check-label fs-6 fw-semibold ms-2 text-dark" for="d8">8. 3x4 өлчөмүндөгү сүрөт — 6 даана</label>
+                    </div>
+                </div>
+                <div class="col-md-12">
+                    <div class="form-check p-3 bg-light rounded-3">
+                        <input class="form-check-input fs-5" type="checkbox" name="doc_9_exam_sheet" id="d9" {% if student.doc_9_exam_sheet %}checked{% endif %}>
+                        <label class="form-check-label fs-6 fw-semibold ms-2 text-dark" for="d9">9. Кабыл алуу сынагынын ведомосту</label>
+                    </div>
+                </div>
+                <div class="col-md-12">
+                    <div class="form-check p-3 bg-light rounded-3">
+                        <input class="form-check-input fs-5" type="checkbox" name="doc_10_contract" id="d10" {% if student.doc_10_contract %}checked{% endif %}>
+                        <label class="form-check-label fs-6 fw-semibold ms-2 text-dark" for="d10">10. Келишим (18ге толсо өзү, толбосо жооптуу адам)</label>
+                    </div>
+                </div>
+                <div class="col-md-12">
+                    <div class="form-check p-3 bg-light rounded-3">
+                        <input class="form-check-input fs-5" type="checkbox" name="doc_11_parent_passport" id="d11" {% if student.doc_11_parent_passport %}checked{% endif %}>
+                        <label class="form-check-label fs-6 fw-semibold ms-2 text-dark" for="d11">11. Ата-энесинин паспортунан көчүрмө</label>
+                    </div>
+                </div>
+                <div class="col-md-12">
+                    <div class="form-check p-3 bg-light rounded-3">
+                        <input class="form-check-input fs-5" type="checkbox" name="doc_12_residence" id="d12" {% if student.doc_12_residence %}checked{% endif %}>
+                        <label class="form-check-label fs-6 fw-semibold ms-2 text-dark" for="d12">12. Жашаган жеринен маалымат</label>
+                    </div>
+                </div>
+            </div>
+
+            <div class="mt-4 text-end">
+                <button type="submit" class="btn btn-success rounded-pill px-5 py-2 fw-bold">
+                    <i class="fa-solid fa-save me-2"></i>Өзгөртүүлөрдү сактоо
+                </button>
+            </div>
+        </form>
+    </div>
+</div>
+{% endblock %}

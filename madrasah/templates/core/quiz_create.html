@@ -1,0 +1,46 @@
+{% extends 'base.html' %}
+
+{% block title %}Жаңы онлайн тест түзүү{% endblock %}
+
+{% block content %}
+<div class="container py-4">
+    <div class="row justify-content-center">
+        <div class="col-md-8">
+            <div class="card border-0 shadow-sm rounded-4 p-4">
+                <h3 class="fw-bold text-primary mb-3">
+                    <i class="fa-solid fa-pen-to-square me-2"></i>Жаңы онлайн тест түзүү
+                </h3>
+                <p class="text-muted mb-4">Медресе окуучулары үчүн жаңы тест пландаштырыңыз жана убакыт чектөөсүн белгилеңиз.</p>
+
+                <form method="POST">
+                    {% csrf_token %}
+                    <div class="mb-3">
+                        <label class="form-label fw-semibold">Тесттин аталышы</label>
+                        <input type="text" name="title" class="form-control rounded-3" placeholder="Мисалы: Фиқҳ илими боюнча тест" required>
+                    </div>
+
+                    <div class="mb-3">
+                        <label class="form-label fw-semibold">Предмет</label>
+                        <input type="text" name="subject" class="form-control rounded-3" placeholder="Мисалы: Фиқҳ" required>
+                    </div>
+
+                    <div class="mb-3">
+                        <label class="form-label fw-semibold">Тайпасы</label>
+                        <input type="text" name="group_name" class="form-control rounded-3" placeholder="Мисалы: 1-тайпа" required>
+                    </div>
+
+                    <div class="mb-4">
+                        <label class="form-label fw-semibold">Убакыт чектөөсү (минут)</label>
+                        <input type="number" name="time_limit" class="form-control rounded-3" value="30" min="5" max="180" required>
+                        <div class="form-text">Окуучунун тестти иштөөсү үчүн берилген убакыт (мисалы: 30 минут).</div>
+                    </div>
+
+                    <button type="submit" class="btn btn-primary btn-lg rounded-pill w-100 shadow-sm fw-semibold">
+                        Кийинки: Суроолорду кошуу <i class="fa-solid fa-arrow-right ms-2"></i>
+                    </button>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

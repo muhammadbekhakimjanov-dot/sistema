@@ -1,0 +1,15 @@
+{% extends "base.html" %}
+{% block content %}
+<div class="card narrow">
+  <h2>{{ target.full_name }}</h2>
+  <form method="post">{% csrf_token %}
+    {% if target.is_active %}{{ form.as_p }}
+      <button class="btn danger">Аккаунтту жабуу</button>
+    {% else %}
+      <p>Жабылган: {{ target.deactivated_at }}<br>Себеби: {{ target.deactivation_reason }}</p>
+      <button class="btn">Кайра активдештирүү</button>
+    {% endif %}
+    <a href="{% url 'user_list' %}">Артка</a>
+  </form>
+</div>
+{% endblock %}

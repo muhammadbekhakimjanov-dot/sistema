@@ -1,0 +1,33 @@
+*{box-sizing:border-box}
+body{margin:0;font-family:system-ui,Arial,sans-serif;background:#f4f6f5;color:#1c2b25}
+.topbar{display:flex;align-items:center;gap:12px;padding:10px 14px;background:#0b6b4b;color:#fff;position:sticky;top:0;z-index:20;height:48px}
+.topbar .who{margin-left:auto;font-size:.85rem}
+.topbar button{background:none;border:0;color:#fff;font-size:1.5rem;cursor:pointer}
+#sidebar{position:fixed;top:48px;left:0;bottom:0;width:240px;background:#fff;border-right:1px solid #ddd;padding:12px;transform:translateX(-100%);transition:.2s;z-index:10;overflow:auto}
+#sidebar.open{transform:none}
+#sidebar a,#sidebar .nav-link{display:block;padding:10px;color:#1c2b25;text-decoration:none;border-radius:6px;width:100%;text-align:left;font-size:1rem}
+#sidebar a:hover,#sidebar .nav-link:hover{background:#e7f3ee}
+main{padding:16px;max-width:1100px;margin:0 auto}
+.card{background:#fff;border-radius:10px;padding:16px;box-shadow:0 1px 4px rgba(0,0,0,.08)}
+.narrow{max-width:420px;margin:24px auto}
+.grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(160px,1fr));gap:12px}
+.stat .n{font-size:2rem;font-weight:700;color:#0b6b4b}
+.btn{display:inline-block;background:#0b6b4b;color:#fff;border:0;padding:9px 14px;border-radius:6px;text-decoration:none;cursor:pointer;font-size:1rem}
+.btn.danger{background:#b3261e}
+.link{background:none;border:0;color:#0b6b4b;cursor:pointer;padding:0;font:inherit}
+input,select{padding:8px;border:1px solid #bbb;border-radius:6px;width:100%;font-size:1rem}
+.filters{display:flex;flex-wrap:wrap;gap:8px;margin-bottom:12px}
+.filters input,.filters select{width:auto;flex:1 1 140px}
+.tablewrap{overflow-x:auto;background:#fff;border-radius:10px}
+table{border-collapse:collapse;width:100%;min-width:560px}
+th,td{padding:10px;border-bottom:1px solid #eee;text-align:left;vertical-align:top}
+.actions{display:flex;gap:10px;flex-wrap:wrap}
+.msg{padding:10px 14px;border-radius:6px;margin-bottom:10px;background:#e7f3ee}
+.msg.error{background:#fde7e5}
+.err{color:#b3261e}
+.pager{text-align:center;margin-top:12px}
+@media(min-width:900px){
+  body.auth #sidebar{transform:none}
+  body.auth .topbar #menuBtn{display:none}
+  body.auth main{margin-left:260px;margin-right:20px;max-width:none}
+}

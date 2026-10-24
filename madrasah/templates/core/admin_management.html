@@ -1,0 +1,176 @@
+{% extends 'base.html' %}
+{% block title %}Администратор панели{% endblock %}
+
+{% block content %}
+<div class="row mb-4 align-items-center">
+    <div class="col">
+        <h3 class="fw-bold text-dark mb-0">
+            <i class="fa-solid fa-gauge-high text-success me-2"></i>Администратордун башкаруу панели
+        </h3>
+        <p class="text-muted small mt-1">Медресе системасындагы бардык бөлүмдөрдү жана маалыматтарды бир жерден тез башкаруу.</p>
+    </div>
+</div>
+
+<div class="row g-4">
+    <!-- Мугалимдерди башкаруу -->
+    <div class="col-md-6 col-lg-4">
+        <div class="card border-0 shadow-sm rounded-4 h-100">
+            <div class="card-body p-4">
+                <div class="d-flex align-items-center mb-3">
+                    <div class="rounded-circle bg-primary-subtle text-primary d-flex align-items-center justify-content-center me-3" style="width: 50px; height: 50px; font-size: 20px;">
+                        <i class="fa-solid fa-chalkboard-user"></i>
+                    </div>
+                    <div>
+                        <h5 class="fw-bold text-dark mb-0">Мугалимдер</h5>
+                        <span class="text-muted small">Жалпы саны: {{ teachers.count }}</span>
+                    </div>
+                </div>
+                <p class="text-muted small">Бардык мугалимдердин тизмеси, сабактары жана байланыш номери.</p>
+            </div>
+            <div class="card-footer bg-transparent border-0 pb-4 px-4">
+                <a href="{% url 'teachers_list' %}" class="btn btn-outline-primary w-100 rounded-pill py-2 fw-semibold">
+                    <i class="fa-solid fa-arrow-right me-2"></i>Башкарууга өтүү
+                </a>
+            </div>
+        </div>
+    </div>
+
+    <!-- Окуучуларды башкаруу -->
+    <div class="col-md-6 col-lg-4">
+        <div class="card border-0 shadow-sm rounded-4 h-100">
+            <div class="card-body p-4">
+                <div class="d-flex align-items-center mb-3">
+                    <div class="rounded-circle bg-success-subtle text-success d-flex align-items-center justify-content-center me-3" style="width: 50px; height: 50px; font-size: 20px;">
+                        <i class="fa-solid fa-user-graduate"></i>
+                    </div>
+                    <div>
+                        <h5 class="fw-bold text-dark mb-0">Окуучулар</h5>
+                        <span class="text-muted small">Жалпы саны: {{ students.count }}</span>
+                    </div>
+                </div>
+                <p class="text-muted small">Окуучулардын тизмеси, сүрөттөрү жана 12 документтин абалы.</p>
+            </div>
+            <div class="card-footer bg-transparent border-0 pb-4 px-4">
+                <a href="{% url 'students_list' %}" class="btn btn-outline-success w-100 rounded-pill py-2 fw-semibold">
+                    <i class="fa-solid fa-arrow-right me-2"></i>Башкарууга өтүү
+                </a>
+            </div>
+        </div>
+    </div>
+
+    <!-- Катышуу журналы (Давомат) - ЯНГИ ҚЎШИЛДИ -->
+    <div class="col-md-6 col-lg-4">
+        <div class="card border-0 shadow-sm rounded-4 h-100">
+            <div class="card-body p-4">
+                <div class="d-flex align-items-center mb-3">
+                    <div class="rounded-circle bg-success-subtle text-success d-flex align-items-center justify-content-center me-3" style="width: 50px; height: 50px; font-size: 20px;">
+                        <i class="fa-solid fa-clipboard-user"></i>
+                    </div>
+                    <div>
+                        <h5 class="fw-bold text-dark mb-0">Катышуу журналы</h5>
+                        <span class="text-muted small">Күнүмдүк давомат</span>
+                    </div>
+                </div>
+                <p class="text-muted small">Окуучулардын сабакка катышуусун белгилөө жана текшерүү.</p>
+            </div>
+            <div class="card-footer bg-transparent border-0 pb-4 px-4">
+                <a href="{% url 'attendance' %}" class="btn btn-outline-success w-100 rounded-pill py-2 fw-semibold">
+                    <i class="fa-solid fa-arrow-right me-2"></i>Журналга өтүү
+                </a>
+            </div>
+        </div>
+    </div>
+
+    <!-- Жарыялар -->
+    <div class="col-md-6 col-lg-4">
+        <div class="card border-0 shadow-sm rounded-4 h-100">
+            <div class="card-body p-4">
+                <div class="d-flex align-items-center mb-3">
+                    <div class="rounded-circle bg-warning-subtle text-warning d-flex align-items-center justify-content-center me-3" style="width: 50px; height: 50px; font-size: 20px;">
+                        <i class="fa-solid fa-bullhorn"></i>
+                    </div>
+                    <div>
+                        <h5 class="fw-bold text-dark mb-0">Жарыялар</h5>
+                        <span class="text-muted small">Жалпы саны: {{ announcements.count }}</span>
+                    </div>
+                </div>
+                <p class="text-muted small">Медресе ичиндеги маанилүү кулактандыруулар жана жаңыликлар.</p>
+            </div>
+            <div class="card-footer bg-transparent border-0 pb-4 px-4">
+                <a href="{% url 'announcements_list' %}" class="btn btn-outline-warning text-dark w-100 rounded-pill py-2 fw-semibold">
+                    <i class="fa-solid fa-arrow-right me-2"></i>Башкарууга өтүү
+                </a>
+            </div>
+        </div>
+    </div>
+
+    <!-- Баалар журналы -->
+    <div class="col-md-6 col-lg-4">
+        <div class="card border-0 shadow-sm rounded-4 h-100">
+            <div class="card-body p-4">
+                <div class="d-flex align-items-center mb-3">
+                    <div class="rounded-circle bg-info-subtle text-info d-flex align-items-center justify-content-center me-3" style="width: 50px; height: 50px; font-size: 20px;">
+                        <i class="fa-solid fa-book-open"></i>
+                    </div>
+                    <div>
+                        <h5 class="fw-bold text-dark mb-0">Баалар журналы</h5>
+                        <span class="text-muted small">Электрондук журнал</span>
+                    </div>
+                </div>
+                <p class="text-muted small">Окуучулардын предметтер боюнча алган баалары жана көрсөткүчтөрү.</p>
+            </div>
+            <div class="card-footer bg-transparent border-0 pb-4 px-4">
+                <a href="{% url 'gradebook' %}" class="btn btn-outline-info text-dark w-100 rounded-pill py-2 fw-semibold">
+                    <i class="fa-solid fa-arrow-right me-2"></i>Журналга өтүү
+                </a>
+            </div>
+        </div>
+    </div>
+
+    <!-- Ата-энелер кабинети -->
+    <div class="col-md-6 col-lg-4">
+        <div class="card border-0 shadow-sm rounded-4 h-100">
+            <div class="card-body p-4">
+                <div class="d-flex align-items-center mb-3">
+                    <div class="rounded-circle bg-danger-subtle text-danger d-flex align-items-center justify-content-center me-3" style="width: 50px; height: 50px; font-size: 20px;">
+                        <i class="fa-solid fa-people-roof"></i>
+                    </div>
+                    <div>
+                        <h5 class="fw-bold text-dark mb-0">Ата-энелер кабинети</h5>
+                        <span class="text-muted small">Балдарды көзөмөлдөө</span>
+                    </div>
+                </div>
+                <p class="text-muted small">Ата-энелер үчүн балдарынын окуусун байкоо панели.</p>
+            </div>
+            <div class="card-footer bg-transparent border-0 pb-4 px-4">
+                <a href="{% url 'parents_cabinet' %}" class="btn btn-outline-danger w-100 rounded-pill py-2 fw-semibold">
+                    <i class="fa-solid fa-arrow-right me-2"></i>Кабинетке өтүү
+                </a>
+            </div>
+        </div>
+    </div>
+
+    <!-- Аракеттер тарыхы (Audit Log) -->
+    <div class="col-md-6 col-lg-4">
+        <div class="card border-0 shadow-sm rounded-4 h-100">
+            <div class="card-body p-4">
+                <div class="d-flex align-items-center mb-3">
+                    <div class="rounded-circle bg-secondary-subtle text-secondary d-flex align-items-center justify-content-center me-3" style="width: 50px; height: 50px; font-size: 20px;">
+                        <i class="fa-solid fa-clock-rotate-left"></i>
+                    </div>
+                    <div>
+                        <h5 class="fw-bold text-dark mb-0">Аракеттер тарыхы</h5>
+                        <span class="text-muted small">Логтар жана аудитордук текшерүү</span>
+                    </div>
+                </div>
+                <p class="text-muted small">Системада ким кандай ўзгартириш киритганини кўриб турувчи тарых.</p>
+            </div>
+            <div class="card-footer bg-transparent border-0 pb-4 px-4">
+                <a href="{% url 'audit_list' %}" class="btn btn-outline-secondary w-100 rounded-pill py-2 fw-semibold">
+                    <i class="fa-solid fa-arrow-right me-2"></i>Тарыхка өтүү
+                </a>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

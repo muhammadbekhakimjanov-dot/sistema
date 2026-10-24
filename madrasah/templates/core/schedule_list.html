@@ -1,0 +1,37 @@
+{% extends 'base.html' %}
+{% block title %}Расписание{% endblock %}
+
+{% block content %}
+<h3 class="fw-bold text-dark mb-4"><i class="fa-solid fa-calendar-days text-warning me-2"></i>Сабактар жана расписание</h3>
+
+<div class="card border-0 shadow-sm rounded-4">
+    <div class="card-body p-0">
+        <div class="table-responsive">
+            <table class="table table-hover align-middle mb-0">
+                <thead class="table-light">
+                    <tr>
+                        <th class="ps-4">Убактысы</th>
+                        <th>Предмет</th>
+                        <th>Мугалим</th>
+                        <th>Тайпа</th>
+                        <th>Кабинет</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for schedule in schedules %}
+                    <tr>
+                        <td class="ps-4 fw-bold">{{ schedule.time|default:"08:00 - 08:45" }}</td>
+                        <td class="fw-semibold text-dark">{{ schedule.subject }}</td>
+                        <td>{{ schedule.teacher.name }}</td>
+                        <td><span class="badge bg-primary rounded-pill px-3">{{ schedule.group|default:"1-тайпа" }}</span></td>
+                        <td>{{ schedule.classroom|default:"101" }}</td>
+                    </tr>
+                    {% empty %}
+                    <tr><td colspan="5" class="text-center py-4 text-muted">Расписание табылган жок.</td></tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+{% endblock %}

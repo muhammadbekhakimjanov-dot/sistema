@@ -1,0 +1,12 @@
+{% extends "base.html" %}
+{% block content %}
+<h2>Аракеттердин тарыхы</h2>
+<div class="tablewrap"><table>
+  <tr><th>Убактысы</th><th>Колдонуучу</th><th>Аракет</th><th>Объект</th><th>Деталдар</th><th>IP</th></tr>
+  {% for l in object_list %}
+  <tr><td>{{ l.created_at|date:"d.m.Y H:i" }}</td><td>{{ l.user.full_name|default:"—" }}</td>
+      <td>{{ l.action }}</td><td>{{ l.model_name }} #{{ l.object_id }}</td>
+      <td>{{ l.details }}</td><td>{{ l.ip_address }}</td></tr>
+  {% endfor %}
+</table></div>
+{% endblock %}

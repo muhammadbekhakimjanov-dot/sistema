@@ -1,0 +1,102 @@
+{% extends 'base.html' %}
+
+{% block title %}Экзамендер тизмеси{% endblock %}
+
+{% block content %}
+<div class="container-fluid px-4">
+    <!-- Юқори қисм: Сарлавҳа ва Янги экзамен қўшиш тугмаси -->
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <div>
+            <h3 class="fw-bold text-dark mb-1">
+                <i class="fa-solid fa-file-lines text-danger me-2"></i>Экзамендер тизмеси
+            </h3>
+            <p class="text-muted mb-0">Медреседеги бардык экзамендерди көзөмөлдөө жана пландаштыруу</p>
+        </div>
+
+        <!-- Агар фойдаланувчи админ ёки ходим бўлса қўшиш тугмаси кўринади -->
+        {% if user.is_staff or request.user.role == 'admin' %}
+        <button class="btn btn-danger rounded-pill px-4 shadow-sm fw-semibold" data-bs-toggle="modal" data-bs-target="#addExamModal">
+            <i class="fa-solid fa-plus me-2"></i>Жаңы экзамен кошуу
+        </button>
+        {% endif %}
+    </div>
+
+    <!-- Жадвал ва карточка -->
+    <div class="card border-0 shadow-sm rounded-4 overflow-hidden">
+        <div class="card-body p-0">
+            <div class="table-responsive">
+                <table class="table table-hover align-middle mb-0">
+                    <thead class="table-light text-uppercase fs-7">
+                        <tr>
+                            <th class="py-3 ps-4">Күнү</th>
+                            <th class="py-3">Предмет (Фан)</th>
+                            <th class="py-3">Тайпа (Гуруҳ)</th>
+                            <th class="py-3 pe-4 text-end">Убактысы</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for exam in exams %}
+                        <tr>
+                            <td class="ps-4 fw-bold text-primary">
+                                <i class="fa-regular fa-calendar me-2"></i>{{ exam.date }}
+                            </td>
+                            <td class="fw-bold text-dark">{{ exam.subject }}</td>
+                            <td>
+                                <span class="badge bg-info text-dark rounded-pill px-3 py-2 border">
+                                    {{ exam.group_name|default:"1-тайпа" }}
+                                </span>
+                            </td>
+                            <td class="pe-4 text-end fw-semibold text-muted">
+                                <i class="fa-regular fa-clock me-1"></i>{{ exam.time|default:"09:00" }}
+                            </td>
+                        </tr>
+                        {% empty %}
+                        <!-- Жадвал бўш бўлганда кўринадиган замонавий блок -->
+                        <tr>
+                            <td colspan="4" class="text-center py-5">
+                                <div class="py-4">
+                                    <div class="mb-3">
+                                        <i class="fa-regular fa-folder-open text-secondary opacity-50" style="font-size: 3.5rem;"></i>
+                                    </div>
+                                    <h5 class="fw-bold text-dark">Жакында экзамендер жок</h5>
+                                    <p class="text-muted mb-3">Учурда системага пландаштырылган экзамендер киргизиле элек.</p>
+                                    {% if user.is_staff or request.user.role == 'admin' %}
+                                    <button class="btn btn-outline-danger btn-sm rounded-pill px-4 fw-semibold" data-bs-toggle="modal" data-bs-target="#addExamModal">
+                                        Биринчи экзаменди кошуу
+                                    </button>
+                                    {% endif %}
+                                </div>
+                            </td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- ЭКЗАМЕН КОШУУ УЧУН МОДАЛЬ ОЙНА (POPUP) -->
+{% if user.is_staff or request.user.role == 'admin' %}
+<div class="modal fade" id="addExamModal" tabindex="-1" aria-labelledby="addExamModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content rounded-4 border-0 shadow">
+            <div class="modal-header bg-danger text-white rounded-top-4 px-4">
+                <h5 class="modal-title fw-bold" id="addExamModalLabel">
+                    <i class="fa-solid fa-file-circle-plus me-2"></i>Жаңы экзамен кошуу
+                </h5>
+                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <form action="/admin/core/exam/add/" method="get">
+                <div class="modal-body p-4 text-center">
+                    <p class="text-muted mb-3">Экзамендерди системага киргизүү үчүн админ панелдин атайын форматына өтөсүз.</p>
+                    <button type="submit" class="btn btn-danger rounded-pill px-4 fw-semibold w-100">
+                        Админ панел аркылуу кошуу
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+{% endif %}
+{% endblock %}
