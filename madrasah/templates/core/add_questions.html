@@ -1,0 +1,65 @@
+{% extends 'base.html' %}
+
+{% block title %}Суроо кошуу{% endblock %}
+
+{% block content %}
+<div class="container py-4">
+    <div class="row justify-content-center">
+        <div class="col-md-8">
+            <div class="card border-0 shadow-sm rounded-4 p-4">
+                <h3 class="fw-bold text-primary mb-3">
+                    <i class="fa-solid fa-circle-question me-2"></i>Тестке суроо кошуу
+                </h3>
+                <p class="text-muted mb-4">Тест: <strong>{{ quiz.title }}</strong></p>
+
+                <form method="POST">
+                    {% csrf_token %}
+                    <div class="mb-3">
+                        <label class="form-label fw-semibold">Суроо матни</label>
+                        <textarea name="question_text" class="form-control rounded-3" rows="3" placeholder="Суроону бул жерге жазыңыз..." required></textarea>
+                    </div>
+
+                    <div class="mb-3">
+                        <label class="form-label fw-semibold">А варианты</label>
+                        <input type="text" name="option_a" class="form-control rounded-3" placeholder="А варианты" required>
+                    </div>
+
+                    <div class="mb-3">
+                        <label class="form-label fw-semibold">Б варианты</label>
+                        <input type="text" name="option_b" class="form-control rounded-3" placeholder="Б варианты" required>
+                    </div>
+
+                    <div class="mb-3">
+                        <label class="form-label fw-semibold">В варианты</label>
+                        <input type="text" name="option_c" class="form-control rounded-3" placeholder="В варианты (эгер болсо)">
+                    </div>
+
+                    <div class="mb-3">
+                        <label class="form-label fw-semibold">Г варианты</label>
+                        <input type="text" name="option_d" class="form-control rounded-3" placeholder="Г варианты (эгер болсо)">
+                    </div>
+
+                    <div class="mb-4">
+                        <label class="form-label fw-semibold">Туура вариант</label>
+                        <select name="correct_answer" class="form-select rounded-3" required>
+                            <option value="A">А</option>
+                            <option value="B">Б</option>
+                            <option value="C">В</option>
+                            <option value="D">Г</option>
+                        </select>
+                    </div>
+
+                    <div class="d-flex gap-2">
+                        <button type="submit" name="add_another" class="btn btn-outline-primary btn-lg rounded-pill w-50 shadow-sm fw-semibold">
+                            + Дагы суроо кошуу
+                        </button>
+                        <button type="submit" name="finish" class="btn btn-primary btn-lg rounded-pill w-50 shadow-sm fw-semibold">
+                            Бүтүрүү / Сактоо
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
