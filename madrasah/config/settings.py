@@ -8,7 +8,7 @@ load_dotenv(BASE_DIR / ".env")
 
 SECRET_KEY = os.environ.get("SECRET_KEY", "django-insecure-your-secret-key-here-change-this")
 DEBUG = os.environ.get("DEBUG", "True") == "True"
-ALLOWED_HOSTS = [h for h in os.environ.get("ALLOWED_HOSTS = ['*']git init", "").split(",") if h]
+ALLOWED_HOSTS = ['sistema-16gr.onrender.com', 'localhost', '127.0.0.1']
 
 INSTALLED_APPS = [
     "jazzmin",  # Админ панелни замонавий қилиш учун (энг бошида туриши шарт)
