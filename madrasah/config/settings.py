@@ -24,6 +24,7 @@ INSTALLED_APPS = [
 
 MIDDLEWARE = [
     "django.middleware.security.SecurityMiddleware",
+    "whitenoise.middleware.WhiteNoiseMiddleware",  # <--- Статик файллар ишлаши учун муҳим!
     "django.contrib.sessions.middleware.SessionMiddleware",
     "django.middleware.locale.LocaleMiddleware",
     "django.middleware.common.CommonMiddleware",
@@ -81,6 +82,7 @@ LOCALE_PATHS = [BASE_DIR / "locale"]
 STATIC_URL = "static/"
 STATICFILES_DIRS = [BASE_DIR / "static"]
 STATIC_ROOT = BASE_DIR / "staticfiles"
+STATICFILES_STORAGE = "whitenoise.storage.CompressedManifestStaticFilesStorage"  # <--- Статик файларни бошқариш учун
 
 MEDIA_URL = "media/"
 MEDIA_ROOT = BASE_DIR / "media"
@@ -133,21 +135,19 @@ JAZZMIN_SETTINGS = {
     "default_icon_parents": "fas fa-folder",
     "default_icon_children": "fas fa-circle",
     "changeform_format": "horizontal_tabs",
-    
-    # Қўшимча тартиблар
     "order_with_respect_to": ["core.Student", "core.Teacher", "core.Subject", "core.Exam", "core.Grade"],
 }
 
 JAZZMIN_UI_TWEAKS = {
-    "navbar": "navbar-dark navbar-teal",
+    "navbar": "navbar-dark navbar-primary",   # <--- Сиз хоҳлаган кўк рангли панель
     "theme": "flatly",
-    "sidebar": "sidebar-dark-teal",
-    "accent": "accent-teal",
+    "sidebar": "sidebar-dark-primary",      # <--- Кўк рангли ён меню
+    "accent": "accent-primary",
     "navbar_fixed": True,
     "sidebar_fixed": True,
     "footer_fixed": False,
     "button_classes": {
-        "primary": "btn-teal",
+        "primary": "btn-primary",
         "secondary": "btn-outline-secondary",
         "info": "btn-info",
         "warning": "btn-warning",
