@@ -113,7 +113,7 @@ JAZZMIN_SETTINGS = {
     "search_model": "core.Student",
     "topmenu_links": [
         {"name": "Бош саҳифа", "url": "admin:index", "permissions": ["auth.view_user"]},
-        {"name": "Сайтга ўтиш", "url": "/"},
+        {"name": "Сайтга ўтиш", "url": "/", "new_window": True},
     ],
     "show_sidebar": True,
     "navigation_expanded": True,
@@ -133,6 +133,9 @@ JAZZMIN_SETTINGS = {
     "default_icon_parents": "fas fa-folder",
     "default_icon_children": "fas fa-circle",
     "changeform_format": "horizontal_tabs",
+    
+    # Қўшимча тартиблар
+    "order_with_respect_to": ["core.Student", "core.Teacher", "core.Subject", "core.Exam", "core.Grade"],
 }
 
 JAZZMIN_UI_TWEAKS = {
@@ -140,6 +143,9 @@ JAZZMIN_UI_TWEAKS = {
     "theme": "flatly",
     "sidebar": "sidebar-dark-teal",
     "accent": "accent-teal",
+    "navbar_fixed": True,
+    "sidebar_fixed": True,
+    "footer_fixed": False,
     "button_classes": {
         "primary": "btn-teal",
         "secondary": "btn-outline-secondary",
