@@ -18,7 +18,7 @@ async def start(update: Update, context: ContextTypes.DEFAULT_TYPE):
     await update.message.reply_text(
         f"Саламатсызбы, {user_first_name}!\n"
         f"Имам Аль-Бухорий медресесинин расмий ботуна кош келдиңиз.\n\n"
-        f"Балаңыздын маалыматтарын көрүү үшін алгач төмөнкү баскычты басып, телефон номериңизди жөнөтүңіз:",
+        f"Балаңыздын маалыматтарын көрүү үчүн алгач төмөнкү баскычты басып, телефон номериңизди жөнөтүңіз:",
         reply_markup=reply_markup
     )
 
@@ -69,7 +69,7 @@ async def davomat_command(update: Update, context: ContextTypes.DEFAULT_TYPE):
         await update.message.reply_text("Катышуу маалыматтары али жок.")
         return
 
-    msg = f"📌 *{parent.student.name}* — акыркы катышуулар:\n\n"
+    msg = f"📌 *{parent.student.name} — акыркы катышуулар:*\n\n"
     status_map = {'present': '✅ Келди', 'absent': '❌ Келган жок', 'late': '⚠️ Кечикти', 'excused': 'ℹ️ Себептүү'}
     for att in attendances:
         msg += f"📅 {att.date}: {status_map.get(att.status, att.status)}\n"
@@ -91,7 +91,7 @@ async def baholar_command(update: Update, context: ContextTypes.DEFAULT_TYPE):
         await update.message.reply_text("Баалар али жок.")
         return
 
-    msg = f"📚 *{parent.student.name}* — акыркы баалар:\n\n"
+    msg = f"📚 *{parent.student.name} — акыркы баалар:*\n\n"
     for g in grades:
         msg += f"📖 {g.subject}: *{g.score} балл* ({g.date})\n"
     await update.message.reply_text(msg, parse_mode="Markdown")
