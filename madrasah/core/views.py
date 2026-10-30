@@ -97,12 +97,22 @@ def telegram_webhook(request):
                 
                 if text == "/start":
                     user_first_name = message["from"].get("first_name", "Урматтуу колдонуучу")
-                    reply_text = (
-                        f"Саламатсызбы, {user_first_name}!\n"
-                        f"Имам Аль-Бухорий медресесинин расмий ботуна кош келдиңиз.\n\n"
-                        f"Балаңыздын маалыматтарын көрүү үчүн системага катталган телефон номериңизди жөнөтүңүз."
-                    )
-                    send_telegram_alert(chat_id, reply_text)
+                    # Телефон рақам сўраш учун ReplyKeyboardMarkup тугмасини юборамиз
+                    url = f"https://api.telegram.org/bot{TOKEN}/sendMessage"
+                    payload = {
+                        "chat_id": chat_id,
+                        "text": (
+                            f"Саламатсызбы, {user_first_name}!\n"
+                            f"Имам Аль-Бухорий медресесинин расмий ботуна кош келдиңиз.\n\n"
+                            f"Балаңыздын маалыматтарын көрүү үшін алгач төмөнкү баскычты басып, телефон номериңизди жөнөтүңүз:"
+                        ),
+                        "reply_markup": {
+                            "keyboard": [[{"text": "📱 Телефон номерди жөнөтүү", "request_contact": True}]],
+                            "resize_keyboard": True,
+                            "one_time_keyboard": True
+                        }
+                    }
+                    requests.post(url, json=payload, timeout=5)
                     
                 elif text == "/davomat":
                     parent = ParentPortal.objects.filter(telegram_chat_id=str(chat_id)).first()
