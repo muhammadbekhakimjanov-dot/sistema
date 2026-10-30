@@ -349,7 +349,7 @@ class Attendance(models.Model):
                 if parent and parent.telegram_chat_id:
                     token = getattr(settings, "TELEGRAM_BOT_TOKEN", "8723045070:AAGCb6vWDINDNTbKSLYDLthP9_ufxYJq2II")
                     
-                    # Сиз талап қилган формация (исм ва ата-эне тўғри кўрсатилди)
+                    # Сиз талаб қилган аниқ формат
                     msg = (
                         f"📌 Имам Аль-Бухорий медресеси\n\n"
                         f"Урматтуу {parent.parent_name}!\n"
@@ -357,6 +357,7 @@ class Attendance(models.Model):
                         f"📅 Күнү: {self.date}"
                     )
                     
+                    # Фақат стандарт ва хавфсиз requests.post ишлатилади
                     response = requests.post(
                         f"https://api.telegram.org/bot{token}/sendMessage",
                         json={"chat_id": parent.telegram_chat_id, "text": msg},
