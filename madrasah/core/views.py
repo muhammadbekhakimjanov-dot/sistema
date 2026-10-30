@@ -1,15 +1,13 @@
 import io
 import json
 import requests
-from asgiref.sync import async_to_sync
 from django.contrib.auth import get_user_model
 from django.contrib.auth.decorators import login_required
 from django.http import HttpResponse, JsonResponse
 from django.shortcuts import get_object_or_404, redirect, render
 from django.views.decorators.csrf import csrf_exempt
 from django.views.generic import ListView
-
-from telegram import Update
+from decouple import config
 
 # ReportLab китепканасы (PDF түзүү үчүн)
 from reportlab.lib import colors
@@ -39,16 +37,15 @@ from .models import (
     ArchiveDocument,
 )
 
-# Импорт бота для вебхука
-from .telegram_bot import application
-
 User = get_user_model()
+
+# Telegram Token
+TOKEN = config("TELEGRAM_BOT_TOKEN", default="8723045070:AAGCb6vWDINDNTbKSLYDLthP9_ufxYJq2II")
 
 
 # --- TELEGRAM БОТ АРКЫЛУУ ЭСКЕРТҮҮ ЖӨНДӨӨ ФУНКЦИЯСЫ ---
 def send_telegram_alert(chat_id, message):
-    token = "8723045070:AAGCb6vWDINDNTbKSLYDLthP9_ufxYJq2II"
-    url = f"https://api.telegram.org/bot{token}/sendMessage"
+    url = f"https://api.telegram.org/bot{TOKEN}/sendMessage"
     payload = {
         "chat_id": chat_id,
         "text": message,
@@ -60,22 +57,97 @@ def send_telegram_alert(chat_id, message):
         print(f"Telegram API Катасы: {e}")
 
 
-# --- TELEGRAM WEBHOOK VIEW (СИНХРОН ВА ХАВФСИЗ УСУЛДА ИШЛАШ) ---
+# --- TELEGRAM WEBHOOK VIEW (ТОЛИҚ СИНХРОН ВА ХАВФСИЗ) ---
 @csrf_exempt
 def telegram_webhook(request):
     if request.method == 'POST':
         try:
             data = json.loads(request.body.decode('utf-8'))
-            update = Update.de_json(data, application.bot)
             
-            # Асинхрон бот жараёнини async_to_sync орқали хавфсиз ишга туширамиз
-            async def run_bot():
-                if not application.running:
-                    await application.initialize()
-                await application.process_update(update)
+            # Агар фойдаланувчи контакт (телефон рақам) юборган бўлса
+            if "message" in data and "contact" in data["message"]:
+                message = data["message"]
+                chat_id = message["chat"]["id"]
+                contact = message["contact"]
+                phone = contact.get("phone_number", "").replace("+", "")
+                
+                # Базадан телефон рақам бўйича ота-энани қидирамиз
+                parent = ParentPortal.objects.filter(phone__icontains=phone).first()
+                if parent:
+                    parent.telegram_chat_id = str(chat_id)
+                    parent.save()
+                    
+                    reply_text = (
+                        f"✅ Куттуктайбыз, {parent.parent_name}! Сиздин Telegram профилиңиз системага ийгиликтүү туташтырылды.\n\n"
+                        f"Эми буйруқларни колдоно аласыз:\n"
+                        f"/davomat — Акыркы катышуу\n"
+                        f"/baholar — Акыркы баалар\n"
+                        f"/kontrakt — Контракт маалыматтары"
+                    )
+                else:
+                    reply_text = "❌ Кечиресиз, бул телефон номер медресе базасынан табылган жок."
+                
+                send_telegram_alert(chat_id, reply_text)
 
-            async_to_sync(run_bot)()
-            
+            # Агар фойдаланувчи /start ёки бошқа командаларни ёзган бўлса
+            elif "message" in data and "text" in data["message"]:
+                message = data["message"]
+                chat_id = message["chat"]["id"]
+                text = message.get("text", "")
+                
+                if text == "/start":
+                    user_first_name = message["from"].get("first_name", "Урматтуу колдонуучу")
+                    reply_text = (
+                        f"Саламатсызбы, {user_first_name}!\n"
+                        f"Имам Аль-Бухорий медресесинин расмий ботуна кош келдиңиз.\n\n"
+                        f"Балаңыздын маалыматтарын көрүү үчүн системага катталган телефон номериңизди жөнөтүңүз."
+                    )
+                    send_telegram_alert(chat_id, reply_text)
+                    
+                elif text == "/davomat":
+                    parent = ParentPortal.objects.filter(telegram_chat_id=str(chat_id)).first()
+                    if not parent:
+                        send_telegram_alert(chat_id, "⚠️ Аккаунтиңиз туташтырыла элек. /start басыңыз.")
+                    else:
+                        attendances = Attendance.objects.filter(student=parent.student).order_by('-date')[:5]
+                        if not attendances:
+                            send_telegram_alert(chat_id, "Катышуу маалыматтары али жок.")
+                        else:
+                            msg = f"📌 *{parent.student.name} — акыркы катышуулар:*\n\n"
+                            status_map = {'present': '✅ Келди', 'absent': '❌ Келган жок', 'late': '⚠️ Кечикти', 'excused': 'ℹ️ Себептүү'}
+                            for att in attendances:
+                                msg += f"📅 {att.date}: {status_map.get(att.status, att.status)}\n"
+                            send_telegram_alert(chat_id, msg)
+                            
+                elif text == "/baholar":
+                    parent = ParentPortal.objects.filter(telegram_chat_id=str(chat_id)).first()
+                    if not parent:
+                        send_telegram_alert(chat_id, "⚠️ Аккаунтиңиз туташтырыла элек. /start басыңыз.")
+                    else:
+                        grades = Grade.objects.filter(student=parent.student).order_by('-date')[:5]
+                        if not grades:
+                            send_telegram_alert(chat_id, "Баалар али жок.")
+                        else:
+                            msg = f"📚 *{parent.student.name} — акыркы баалар:*\n\n"
+                            for g in grades:
+                                msg += f"📖 {g.subject}: *{g.score} балл* ({g.date})\n"
+                            send_telegram_alert(chat_id, msg)
+                            
+                elif text == "/kontrakt":
+                    parent = ParentPortal.objects.filter(telegram_chat_id=str(chat_id)).first()
+                    if not parent:
+                        send_telegram_alert(chat_id, "⚠️ Аккаунтиңиз туташтырыла элек. /start басыңыз.")
+                    else:
+                        student = parent.student
+                        msg = (
+                            f"💳 *Контракт маалыматтары*\n\n"
+                            f"👨‍👦 Окуучу: {student.name}\n"
+                            f"💰 Жалпы: {student.contract_amount} сом\n"
+                            f"✅ Төлөнгөнү: {student.total_paid} сом\n"
+                            f"⚠️ Карыз: {student.remaining_debt} сом"
+                        )
+                        send_telegram_alert(chat_id, msg)
+
             return JsonResponse({"status": "ok"})
         except Exception as e:
             print(f"Webhook хатолиги: {e}")
@@ -193,7 +265,7 @@ def attendance_view(request):
                 parent = ParentPortal.objects.filter(student=student).first()
                 if parent and hasattr(parent, 'telegram_chat_id') and parent.telegram_chat_id:
                     msg = (
-                        f"📌 *Имам Аль-Бухорий медресеси*\n\n"
+                        f"📌 Имам Аль-Бухорий медресеси\n\n"
                         f"Урматтуу {parent.parent_name}!\n"
                         f"Сиздин балаңыз {student.name} бүгүнкү сабакка келген жок.\n"
                         f"📅 Күнү: {date}"
