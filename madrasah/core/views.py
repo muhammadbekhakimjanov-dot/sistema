@@ -1,9 +1,11 @@
 import io
+import json
 import requests
 from django.contrib.auth import get_user_model
 from django.contrib.auth.decorators import login_required
-from django.http import HttpResponse
+from django.http import HttpResponse, JsonResponse
 from django.shortcuts import get_object_or_404, redirect, render
+from django.views.decorators.csrf import csrf_exempt
 from django.views.generic import ListView
 
 # ReportLab китепканасы (PDF түзүү үчүн)
@@ -34,6 +36,9 @@ from .models import (
     ArchiveDocument,  # <-- Архив модели импортко кошулду
 )
 
+# Импорт бота для вебхука
+from .telegram_bot import application
+
 User = get_user_model()
 
 
@@ -50,6 +55,30 @@ def send_telegram_alert(chat_id, message):
         requests.post(url, json=payload, timeout=5)
     except Exception as e:
         print(f"Telegram API Катасы: {e}")
+
+
+# --- TELEGRAM WEBHOOK VIEW (ИНТЕРНЕТ ОРҚАЛИ ХАБАР ҚАБУЛ ҚИЛИШ) ---
+@csrf_exempt
+async def telegram_webhook(request):
+    if request.method == 'POST':
+        try:
+            # Telegram юборган JSON маълумотни ўқиймиз
+            data = json.loads(request.body.decode('utf-8'))
+            update = Update.de_json(data, application.bot)
+            
+            # Ботни инициализация қилиш
+            if not application.running:
+                await application.initialize()
+            
+            # Янгиликни ботга қайта ишлаш учун узатамиз
+            await application.process_update(update)
+            
+            return JsonResponse({"status": "ok"})
+        except Exception as e:
+            print(f"Webhook хатолиги: {e}")
+            return JsonResponse({"status": "error", "message": str(e)}, status=400)
+            
+    return HttpResponse("Фақат POST сўровлар қабул қилинади", status=405)
 
 
 @login_required

@@ -25,7 +25,7 @@ class AuditLog(models.Model):
         verbose_name_plural = 'Аракеттер тарыхы'
 
     def __str__(self):
-        return f"{self.action} - {self.model_name} ({self.created_at})"
+        return f"{self.action} {self.model_name} ({self.created_at})"
 
 
 class SystemSetting(models.Model):
@@ -314,7 +314,7 @@ class DutyLog(models.Model):
 
 
 class Attendance(models.Model):
-    """Окуучулардын сабакка катышуусу (Давомат) ва Telegram хабарномаси"""
+    """Окуучулардын сабакка катышуусу (Давомат) жана Telegram кабарномасы"""
     STATUS_CHOICES = (
         ('present', 'Катышты (Келди)'),
         ('absent', 'Катышкан жок (Келген жок)'),
@@ -335,6 +335,7 @@ class Attendance(models.Model):
         return f"{self.student.name} - {self.date} ({self.get_status_display()})"
 
     def save(self, *args, **kwargs):
+        print("--- ATTENDANCE SAVE METHOD ISHLADI ---")
         is_new = self.pk is None
         old_status = None
         if not is_new:
@@ -346,19 +347,25 @@ class Attendance(models.Model):
             try:
                 parent = ParentPortal.objects.filter(student=self.student).first()
                 if parent and parent.telegram_chat_id:
-                    token = "8723045070:AAGCb6vWDINDNTbKSLYDLthP9_ufxYJq2II"
+                    token = getattr(settings, "TELEGRAM_BOT_TOKEN", "8723045070:AAGCb6vWDINDNTbKSLYDLthP9_ufxYJq2II")
+                    
+                    # Ота-эна сөзү алынып ташталып, уулуңуз деп түзөлдү
                     msg = (
-                        f"📌 *Имам Аль-Бухорий медресеси*\n\n"
-                        f"Ҳурматли ота-эна *{parent.parent_name}*!\n"
-                        f"Сизнинг фарзандингиз *{self.student.name}* ({self.student.group}) "
-                        f"бугунги сабаққа келген жок.\n"
-                        f"📅 Сана: {self.date}"
+                        f"📌 Имам Аль-Бухорий медресеси\n\n"
+                        f"Урматтуу {parent.parent_name}!\n"
+                        f"Сиздин уулуңуз {self.student.name} ({self.student.group}) "
+                        f"бүгүнкү сабакка келген жок.\n"
+                        f"📅 Күнү: {self.date}"
                     )
-                    requests.post(
+                    
+                    response = requests.post(
                         f"https://api.telegram.org/bot{token}/sendMessage",
-                        json={"chat_id": parent.telegram_chat_id, "text": msg, "parse_mode": "Markdown"},
+                        json={"chat_id": parent.telegram_chat_id, "text": msg},
                         timeout=5
                     )
+                    print(f"Telegram API жообу: {response.status_code} - {response.text}")
+                else:
+                    print(f"--- ЭСКЕРТҮҮ: {self.student.name} үчүн ParentPortal же telegram_chat_id табылган жок! ---")
             except Exception as e:
                 print(f"Telegram alert error: {e}")
 
@@ -368,26 +375,26 @@ class Payment(models.Model):
     student = models.ForeignKey(Student, on_delete=models.CASCADE, related_name='payments', verbose_name="Окуучу")
     amount = models.DecimalField(max_digits=10, decimal_places=2, verbose_name="Суммасы")
     date = models.DateField(auto_now_add=True, verbose_name="Төлөнгөн күнү")
-    description = models.CharField(max_length=255, blank=True, null=True, verbose_name="Мақсаты/Түшүндүрмө")
+    description = models.CharField(max_length=255, blank=True, null=True, verbose_name="Максаты/Түшүндүрмө")
 
     class Meta:
         verbose_name = "Төлөм"
-        verbose_name_plural = "Бухгалтерия ва төлөмдөр"
+        verbose_name_plural = "Бухгалтерия жана төлөмдөр"
 
     def __str__(self):
         return f"{self.student.name} - {self.amount} сом ({self.date})"
 
 
 class Quiz(models.Model):
-    title = models.CharField(max_length=200, verbose_name="Тест номи")
+    title = models.CharField(max_length=200, verbose_name="Тесттин аталышы")
     subject = models.CharField(max_length=100, verbose_name="Фан")
-    group_name = models.CharField(max_length=50, verbose_name="Тайпа (Гуруҳ)")
-    time_limit_minutes = models.IntegerField(default=30, verbose_name="Вақт чеклови (минут)")
-    is_active = models.BooleanField(default=True, verbose_name="Фаол")
+    group_name = models.CharField(max_length=50, verbose_name="Тайпа")
+    time_limit_minutes = models.IntegerField(default=30, verbose_name="Убакыт чектөөсү (минут)")
+    is_active = models.BooleanField(default=True, verbose_name="Активдүү")
 
     class Meta:
         verbose_name = "Онлайн тест"
-        verbose_name_plural = "Онлайн тестлар"
+        verbose_name_plural = "Онлайн тесттер"
 
     def __str__(self):
         return f"{self.title} ({self.subject})"
@@ -395,39 +402,39 @@ class Quiz(models.Model):
 
 class Question(models.Model):
     quiz = models.ForeignKey(Quiz, on_delete=models.CASCADE, related_name='questions', verbose_name="Тест")
-    text = models.TextField(verbose_name="Савол матни")
+    text = models.TextField(verbose_name="Суроо тексти")
 
     class Meta:
-        verbose_name = "Савол"
-        verbose_name_plural = "Саволлар"
+        verbose_name = "Суроо"
+        verbose_name_plural = "Суроолор"
 
     def __str__(self):
         return self.text[:50]
 
 
 class AnswerChoice(models.Model):
-    question = models.ForeignKey(Question, on_delete=models.CASCADE, related_name='choices', verbose_name="Савол")
-    text = models.CharField(max_length=255, verbose_name="Вариант матни")
-    is_correct = models.BooleanField(default=False, verbose_name="Тўғри жавобми?")
+    question = models.ForeignKey(Question, on_delete=models.CASCADE, related_name='choices', verbose_name="Суроо")
+    text = models.CharField(max_length=255, verbose_name="Вариант тексти")
+    is_correct = models.BooleanField(default=False, verbose_name="Туура жооппу?")
 
     class Meta:
-        verbose_name = "Жавоб варианти"
-        verbose_name_plural = "Жавоб вариантлари"
+        verbose_name = "Жооп варианты"
+        verbose_name_plural = "Жооп варианттары"
 
     def __str__(self):
-        return f"{self.text} ({'Тўғри' if self.is_correct else 'Нотўғри'})"
+        return f"{self.text} ({'Туура' if self.is_correct else 'Туура эмес'})"
 
 
 class QuizResult(models.Model):
     quiz = models.ForeignKey(Quiz, on_delete=models.CASCADE, verbose_name="Тест")
-    student_name = models.CharField(max_length=100, verbose_name="Ўқувчи исми")
-    score = models.IntegerField(verbose_name="Тўпланган балл")
-    total_questions = models.IntegerField(verbose_name="Умумий саволлар")
-    completed_at = models.DateTimeField(auto_now_add=True, verbose_name="Топширилган вақти")
+    student_name = models.CharField(max_length=100, verbose_name="Окуучунун аты")
+    score = models.IntegerField(verbose_name="Топтогон баллы")
+    total_questions = models.IntegerField(verbose_name="Жалпы суроолор")
+    completed_at = models.DateTimeField(auto_now_add=True, verbose_name="Тапшырылган убакыты")
 
     class Meta:
-        verbose_name = "Тест натижаси"
-        verbose_name_plural = "Тест натижалари"
+        verbose_name = "Тесттин жыйынтыгы"
+        verbose_name_plural = "Тест жыйынтыктары"
 
     def __str__(self):
         return f"{self.student_name} — {self.quiz.title}: {self.score}/{self.total_questions}"

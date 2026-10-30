@@ -6,7 +6,7 @@ urlpatterns = [
     path('admin-panel/', views.admin_management_view, name='admin_management'),
     path('teachers/', views.teachers_list_view, name='teachers_list'),
     path('students/', views.students_list_view, name='students_list'),
-    path('student/<int:student_id>/documents/', views.update_student_documents, name='student_documents'),  # <-- Мана бу янги қўшилди
+    path('student/<int:student_id>/documents/', views.update_student_documents, name='student_documents'),  # Документтер
     path('gradebook/', views.gradebook_view, name='gradebook'),
     path('schedule/', views.schedule_list_view, name='schedule_list'),
     path('exams/', views.exams_list_view, name='exams_list'),
@@ -23,4 +23,7 @@ urlpatterns = [
     path('quiz/<int:quiz_id>/add-questions/', views.quiz_add_questions_view, name='quiz_add_questions'),
     path('quiz/<int:quiz_id>/take/', views.quiz_take_view, name='quiz_take'),
     path('quiz/results/', views.quiz_results_list_view, name='quiz_results'),
+    
+    # --- Telegram Webhook йўналиши (Янги қўшилди) ---
+    path('webhook/telegram/', views.telegram_webhook, name='telegram_webhook'),
 ]
