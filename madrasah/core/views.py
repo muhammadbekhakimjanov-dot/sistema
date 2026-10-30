@@ -8,8 +8,10 @@ from django.shortcuts import get_object_or_404, redirect, render
 from django.views.decorators.csrf import csrf_exempt
 from django.views.generic import ListView
 
-# ReportLab китепканасы (PDF түзүү үчүн)
+# Telegram Update импорт қилинди (Webhook хатоликларининг олдини олиш учун)
 from telegram import Update
+
+# ReportLab китепканасы (PDF түзүү үчүн)
 from reportlab.lib import colors
 from reportlab.lib.pagesizes import A4
 from reportlab.lib.styles import ParagraphStyle, getSampleStyleSheet
@@ -34,7 +36,7 @@ from .models import (
     Question,
     AnswerChoice,
     QuizResult,
-    ArchiveDocument,  # <-- Архив модели импортко кошулду
+    ArchiveDocument,
 )
 
 # Импорт бота для вебхука
@@ -192,9 +194,8 @@ def attendance_view(request):
                 if parent and hasattr(parent, 'telegram_chat_id') and parent.telegram_chat_id:
                     msg = (
                         f"📌 *Имам Аль-Бухорий медресеси*\n\n"
-                        f"Урматтуу ата-эне *{parent.parent_name}*!\n"
-                        f"Сиздин балаңыз/кызыңыз *{student.name}* ({student.group}) "
-                        f"бүгүнкү сабакка келген жок.\n"
+                        f"Урматтуу {parent.parent_name}!\n"
+                        f"Сиздин балаңыз {student.name} бүгүнкү сабакка келген жок.\n"
                         f"📅 Күнү: {date}"
                     )
                     send_telegram_alert(parent.telegram_chat_id, msg)
