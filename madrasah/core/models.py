@@ -152,7 +152,7 @@ class Exam(models.Model):
     time = models.TimeField(verbose_name='Убакыты')
 
     def __str__(self):
-        return f'{self.subject} - {self.group_name} ({self.date})'
+        return f'{self.subject} {self.group_name} ({self.date})'
 
     class Meta:
         verbose_name = 'Экзамен'
@@ -196,7 +196,7 @@ class ElectronicJournal(models.Model):
     date = models.DateField(auto_now_add=True, verbose_name='Күнү')
 
     def __str__(self):
-        return f'{self.student} - {self.subject}: {self.grade}'
+        return f'{self.student} {self.subject}: {self.grade}'
 
     class Meta:
         verbose_name = 'Электрондук журнал'
@@ -233,7 +233,7 @@ class Grade(models.Model):
         ordering = ['-date']
 
     def __str__(self):
-        return f'{self.student} - {self.subject}: {self.score}'
+        return f'{self.student} {self.subject}: {self.score}'
 
 
 class ParentPortal(models.Model):
@@ -257,7 +257,7 @@ class Accounting(models.Model):
     status = models.CharField(max_length=50, default='Төлөндү', verbose_name='Статусу')
 
     def __str__(self):
-        return f'{self.employee} - {self.amount} сом'
+        return f'{self.employee} {self.amount} сом'
 
     class Meta:
         verbose_name = 'Бухгалтерия'
@@ -271,7 +271,7 @@ class Schedule(models.Model):
     time = models.TimeField(verbose_name='Убакыты')
 
     def __str__(self):
-        return f'{self.subject} ({self.day_of_week} - {self.time})'
+        return f'{self.subject} ({self.day_of_week} {self.time})'
 
     class Meta:
         verbose_name = 'Сабак расписаниеси'
@@ -285,7 +285,7 @@ class DisciplineRecord(models.Model):
     action_type = models.CharField(max_length=255, verbose_name='Көрүлгөн чара', blank=True)
 
     def __str__(self):
-        return f'{self.student} - {self.incident_type}'
+        return f'{self.student} {self.incident_type}'
 
     class Meta:
         verbose_name = 'Тартип жазуусу'
@@ -310,7 +310,7 @@ class DutyLog(models.Model):
         ordering = ['-date']
 
     def __str__(self):
-        return f"{self.teacher.name} - {self.date} ({self.get_shift_display()})"
+        return f"{self.teacher.name} {self.date} ({self.get_shift_display()})"
 
 
 class Attendance(models.Model):
@@ -332,7 +332,7 @@ class Attendance(models.Model):
         unique_together = ('student', 'date')
 
     def __str__(self):
-        return f"{self.student.name} - {self.date} ({self.get_status_display()})"
+        return f"{self.student.name} {self.date} ({self.get_status_display()})"
 
     def save(self, *args, **kwargs):
         print("--- ATTENDANCE SAVE METHOD ISHLADI ---")
@@ -349,12 +349,11 @@ class Attendance(models.Model):
                 if parent and parent.telegram_chat_id:
                     token = getattr(settings, "TELEGRAM_BOT_TOKEN", "8723045070:AAGCb6vWDINDNTbKSLYDLthP9_ufxYJq2II")
                     
-                    # Ота-эна сөзү алынып ташталып, уулуңуз деп түзөлдү
+                    # Сиз талап қилган формация (исм ва ата-эне тўғри кўрсатилди)
                     msg = (
                         f"📌 Имам Аль-Бухорий медресеси\n\n"
                         f"Урматтуу {parent.parent_name}!\n"
-                        f"Сиздин уулуңуз {self.student.name} ({self.student.group}) "
-                        f"бүгүнкү сабакка келген жок.\n"
+                        f"Сиздин балаңыз {self.student.name} бүгүнкү сабакка келген жок.\n"
                         f"📅 Күнү: {self.date}"
                     )
                     
@@ -363,7 +362,7 @@ class Attendance(models.Model):
                         json={"chat_id": parent.telegram_chat_id, "text": msg},
                         timeout=5
                     )
-                    print(f"Telegram API жообу: {response.status_code} - {response.text}")
+                    print(f"Telegram API жообу: {response.status_code} {response.text}")
                 else:
                     print(f"--- ЭСКЕРТҮҮ: {self.student.name} үчүн ParentPortal же telegram_chat_id табылган жок! ---")
             except Exception as e:
@@ -382,7 +381,7 @@ class Payment(models.Model):
         verbose_name_plural = "Бухгалтерия жана төлөмдөр"
 
     def __str__(self):
-        return f"{self.student.name} - {self.amount} сом ({self.date})"
+        return f"{self.student.name} {self.amount} сом ({self.date})"
 
 
 class Quiz(models.Model):
