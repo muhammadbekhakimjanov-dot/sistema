@@ -1,6 +1,7 @@
 import io
 import json
 import requests
+from asgiref.sync import async_to_sync
 from django.contrib.auth import get_user_model
 from django.contrib.auth.decorators import login_required
 from django.http import HttpResponse, JsonResponse
@@ -8,7 +9,6 @@ from django.shortcuts import get_object_or_404, redirect, render
 from django.views.decorators.csrf import csrf_exempt
 from django.views.generic import ListView
 
-# Telegram Update импорт қилинди (Webhook хатоликларининг олдини олиш учун)
 from telegram import Update
 
 # ReportLab китепканасы (PDF түзүү үчүн)
@@ -60,21 +60,21 @@ def send_telegram_alert(chat_id, message):
         print(f"Telegram API Катасы: {e}")
 
 
-# --- TELEGRAM WEBHOOK VIEW (ИНТЕРНЕТ ОРҚАЛИ ХАБАР ҚАБУЛ ҚИЛИШ) ---
+# --- TELEGRAM WEBHOOK VIEW (СИНХРОН ВА ХАВФСИЗ УСУЛДА ИШЛАШ) ---
 @csrf_exempt
-async def telegram_webhook(request):
+def telegram_webhook(request):
     if request.method == 'POST':
         try:
-            # Telegram юборган JSON маълумотни ўқиймиз
             data = json.loads(request.body.decode('utf-8'))
             update = Update.de_json(data, application.bot)
             
-            # Ботни инициализация қилиш
-            if not application.running:
-                await application.initialize()
-            
-            # Янгиликни ботга қайта ишлаш учун узатамиз
-            await application.process_update(update)
+            # Асинхрон бот жараёнини async_to_sync орқали хавфсиз ишга туширамиз
+            async def run_bot():
+                if not application.running:
+                    await application.initialize()
+                await application.process_update(update)
+
+            async_to_sync(run_bot)()
             
             return JsonResponse({"status": "ok"})
         except Exception as e:
